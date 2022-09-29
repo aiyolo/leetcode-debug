@@ -6,6 +6,8 @@
 
 # 演示
 
+[link](https://p1.meituan.net/dpplatform/18253d49b9e0d1323868e34697f5f4248365722.gif)
+
 ![](https://p1.meituan.net/dpplatform/18253d49b9e0d1323868e34697f5f4248365722.gif)
 
 # 使用方法
