@@ -1,0 +1,18 @@
+{
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.associations": {
+        "utility": "cpp",
+        "iostream": "cpp",
+        "functional": "cpp",
+        "memory_resource": "cpp",
+        "tuple": "cpp",
+        "memory": "cpp",
+        "mutex": "cpp",
+        "scoped_allocator": "cpp",
+        "thread": "cpp",
+        "type_traits": "cpp",
+        "variant": "cpp",
+        "array": "cpp",
+        "vector": "cpp"
+    }
+}
