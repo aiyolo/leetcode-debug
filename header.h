@@ -41,7 +41,7 @@ template <typename Ret, typename... Args> struct function_traits<Ret(Args...)> {
   typedef Ret return_type;
   using stl_function_type = std::function<function_type>;
   typedef Ret (*pointer)(Args...);
-  using tuple_type = tuple<Args...>;
+  using tuple_type = tuple<decay_t<Args>...>; // 需要移除掉输入参数的引用类型
   template <size_t I> struct args {
     static_assert(I < arity, "index out of range");
     using type = typename std::tuple_element<I, std::tuple<Args...>>::type;
@@ -666,28 +666,34 @@ public:
     constexpr size_t I = function_traits<F>::arity;
     // using function_type = function_traits<F>::stl_function_type;
     // cout << I;
-    // using tuple_type = typename function_traits<function_type>::tuple_type;
-    // tuple_type tp;
-    tuple tp = make_tuple("[2,5,1,3,4,7]", 3);
+    using tuple_type = typename function_traits<F>::tuple_type;
+    // vector<int> a ={2,5,1,3,4,7};
+    // tuple_type tp= make_tuple(a, 3);
+    tuple_type tp;
     trans(arr, tp);
-    return call(forward<F>(f), make_index_sequence<I>{}, tp);
+    cout << get<0>(tp);
+    // return (*m_instance.*f)(a, 3);
+    // return apply((*m_instance.*f), tp);
+    return call(f, make_index_sequence<I>{}, tp);
+    // return 1;
   }
-//   template <size_t I = 0, typename... Args>
-//   typename enable_if<I == sizeof...(Args), void>::type
-//   trans(vector<string> &arr, tuple<Args...> &tp) {
-//     return;
-//   }
-  template <size_t I = 0, typename... Args, class Tuple>
+  template <size_t I = 0, typename... Args, class Container>
+  typename enable_if<I == sizeof...(Args), void>::type
+  trans(Container &arr, 
+  tuple<Args...> &tp) {
+    return;
+  }
+  template <size_t I = 0, typename... Args, class Container>
       typename enable_if < I<sizeof...(Args), void>::type
-                           trans(vector<string> &&arr, Tuple &&tp) {
+                           trans(Container& arr, tuple<Args...> &tp) {
     if constexpr (I == sizeof...(Args))
       return;
     transform(arr[I], get<I>(tp));
-    trans<I + 1>(forward<vector<string>>(arr), forward<Tuple>(tp));
+    trans<I + 1>(arr, tp);
   }
   template <typename F, class Tuple, size_t... I>
-  constexpr decltype(auto) call(F &&f, index_sequence<I...>, Tuple &&tp) {
-    return invoke(forward<F>(f), m_instance, get<I>(forward<Tuple>(tp))...);
+  constexpr decltype(auto) call(F &&f, index_sequence<I...>, Tuple &tp) {
+    return invoke(f, m_instance, get<I>(tp)...);
   }
   // private:
   Excecutor() = default;
