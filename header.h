@@ -72,6 +72,7 @@ FUNCTION_TRAITS(const volatile)
 template <typename Callable>
 struct function_traits : function_traits<decltype(&Callable::operator())> {};
 
+// lambda到function的变换
 template <typename Function>
 typename function_traits<Function>::stl_function_type
 to_function(const Function &lambda) {
@@ -79,6 +80,7 @@ to_function(const Function &lambda) {
       lambda);
 }
 
+// lambda到function的变换
 template <typename Function>
 typename function_traits<Function>::stl_function_type
 to_function(Function &&lambda) {
@@ -634,23 +636,79 @@ transform(string s, T &t) {
   t = stringToTreeNode(s);
 }
 
-template <typename T0, typename... T>
-void parse(ifstream &cin, T0 &t0, T &...t) {
-  string s;
-  getline(cin, s);
-  transform(s, t0);
-  if constexpr (sizeof...(t) > 0)
-    parse(cin, t...); // c++ 17 requiered
-}
+template <typename T>
+struct MemFunctionBase{
+  virtual void operator()(T *obj, void* m_arguments) {} // 需要虚函数调用子类函数
+};
+
+template <typename T, typename F>
+struct MemFunction:public MemFunctionBase<T>{
+  using tuple_type = typename function_traits<F>::tuple_type;
+  using return_type = typename function_traits<F>::return_type;
+  static constexpr size_t I = function_traits<F>::arity;
+
+  // tuple_type m_arguments;
+  F m_func;
+
+  MemFunction(F func):m_func(func){}
+
+  // 输出位置
+  template<size_t...Is>
+  void exec(T* obj, void* m_arguments, index_sequence<Is...>){
+    if constexpr (is_void_v<return_type>){
+      (*obj.*m_func)(get<Is>(*(tuple_type*)(m_arguments))...);
+    }
+    else{
+      cout << (*obj.*m_func)(get<Is>(*(tuple_type*)(m_arguments))...);
+    }
+  }
+  void operator()(T* obj, void* m_arguments){
+    exec(obj, m_arguments, make_index_sequence<I>());
+  }
+} ;
+
 
 template <typename T> class Excecutor {
 public:
+  unordered_map<string, MemFunctionBase<T>*> funcMap;
+  vector<string> m_arguments;
   template <typename... Args> static T *Instance(Args &&...args) {
     if (m_instance == nullptr) {
       m_instance = new T(forward<T>(args)...);
     }
     return m_instance;
   }
+
+  void parse(){
+    ifstream cin("../testcases.txt");
+    string str;
+    while (getline(cin, str)) {
+      m_arguments.push_back(str);
+    }
+  }
+
+  void run(){
+    vector<string> cmd;
+    vector<string> args;
+    cmd = stringToStringVector(m_arguments[0]);
+    cout << cmd;
+    args = stringToStringVector(m_arguments[1]);
+    cout << args;
+    // for(int i=0; i<m_arguments.size(); i++){
+
+    // }
+  }
+
+  template<typename F>
+  void callMemFunc(string s, F&& func){
+    using tuple_type = typename function_traits<F>::tuple_type;
+    tuple_type tp;
+    trans(m_arguments, tp);
+    MemFunctionBase<T>* pFuncBase = static_cast<MemFunctionBase<T>*>(new MemFunction<T, F>(func)); 
+    funcMap.emplace(s, pFuncBase);
+    (*funcMap["shuffle"])(m_instance, (void*)(&tp));
+  }
+
 
   template <typename F>
   decltype(auto) init(F &&f) {

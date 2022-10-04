@@ -18,5 +18,8 @@ public:
 
 int main(){
     Excecutor<Solution> exc;
-    exc.init(&Solution::shuffle);
+    // exc.init(&Solution::shuffle);
+    exc.parse();
+    exc.callMemFunc("shuffle", &Solution::shuffle);
+    // exc.run();
 }
