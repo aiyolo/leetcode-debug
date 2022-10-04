@@ -217,7 +217,7 @@ inline vector<int> stringToIntegerVector(string input) {
   return output;
 }
 
-vector<vector<int>> stringTo2dIntegerVector(string input) {
+inline vector<vector<int>> stringTo2dIntegerVector(string input) {
   vector<vector<int>> output;
   trimLeftTrailingSpaces(input);
   trimRightTrailingSpaces(input);
@@ -234,7 +234,7 @@ vector<vector<int>> stringTo2dIntegerVector(string input) {
   return output;
 }
 
-string stringToString(string input) {
+inline string stringToString(string input) {
   assert(input.length() >= 2);
   string result;
   for (int i = 1; i < input.length() - 1; i++) {
@@ -277,7 +277,7 @@ string stringToString(string input) {
   return result;
 }
 
-vector<string> stringToStringVector(string input) {
+inline vector<string> stringToStringVector(string input) {
   vector<string> output;
   trimLeftTrailingSpaces(input);
   trimRightTrailingSpaces(input);
@@ -294,7 +294,7 @@ vector<string> stringToStringVector(string input) {
   return output;
 }
 
-string integerVectorToString(vector<int> list, int length = -1) {
+inline string integerVectorToString(vector<int> list, int length = -1) {
   if (length == -1) {
     length = list.size();
   }
@@ -311,7 +311,7 @@ string integerVectorToString(vector<int> list, int length = -1) {
   return "[" + result.substr(0, result.length() - 2) + "]";
 }
 
-ListNode *stringToListNode(string input) {
+inline ListNode *stringToListNode(string input) {
   // Generate list from the input
   vector<int> list = stringToIntegerVector(input);
 
@@ -327,7 +327,7 @@ ListNode *stringToListNode(string input) {
   return ptr;
 }
 
-string listNodeToString(ListNode *node) {
+inline string listNodeToString(ListNode *node) {
   if (node == nullptr) {
     return "[]";
   }
@@ -340,7 +340,7 @@ string listNodeToString(ListNode *node) {
   return "[" + result.substr(0, result.length() - 2) + "]";
 }
 
-int stringToInteger(string input) { return stoi(input); }
+inline int stringToInteger(string input) { return stoi(input); }
 
 // // 创建环形链表 array -> ListNode
 // ListNode * createCycleList(int arr[], int len, int k){
@@ -358,7 +358,7 @@ int stringToInteger(string input) { return stoi(input); }
 //     return dummyHead->next;
 // }
 
-string treeNodeToString(TreeNode *root) {
+inline string treeNodeToString(TreeNode *root) {
   if (root == nullptr) {
     return "[]";
   }
@@ -516,7 +516,7 @@ ostream &operator<<(ostream &os, const vector<vector<T>> &arr) {
 //     cout << endl;
 // }
 
-void prettyPrintTree(TreeNode *node, string prefix = "", bool isLeft = true) {
+inline void prettyPrintTree(TreeNode *node, string prefix = "", bool isLeft = true) {
   if (node == nullptr) {
     cout << "Empty tree";
     return;
@@ -533,7 +533,7 @@ void prettyPrintTree(TreeNode *node, string prefix = "", bool isLeft = true) {
   }
 }
 
-TreeNode *stringToTreeNode(string input) {
+inline TreeNode *stringToTreeNode(string input) {
   trimLeftTrailingSpaces(input);
   trimRightTrailingSpaces(input);
   input = input.substr(1, input.length() - 2);
@@ -579,14 +579,14 @@ TreeNode *stringToTreeNode(string input) {
   return root;
 }
 
-bool stringToBool(string input) {
+inline bool stringToBool(string input) {
   transform(input.begin(), input.end(), input.begin(), ::tolower);
   return input == "true";
 }
 
-string boolToString(bool input) { return input ? "True" : "False"; }
+inline string boolToString(bool input) { return input ? "True" : "False"; }
 
-double stringToDouble(string input) { return stod(input); }
+inline double stringToDouble(string input) { return stod(input); }
 
 // enable_if 重载
 template <typename T>
@@ -662,16 +662,9 @@ public:
     }
     constexpr size_t I = function_traits<F>::arity;
     using return_type = typename function_traits<F>::return_type;
-    // using function_type = function_traits<F>::stl_function_type;
-    // cout << I;
     using tuple_type = typename function_traits<F>::tuple_type;
-    // vector<int> a ={2,5,1,3,4,7};
-    // tuple_type tp= make_tuple(a, 3);
     tuple_type tp;
     trans(arr, tp);
-    cout << get<0>(tp);
-    // return (*m_instance.*f)(a, 3);
-    // return apply((*m_instance.*f), tp);
     if constexpr (is_void_v<return_type>){
       call(f, make_index_sequence<I>{}, tp);
     }
