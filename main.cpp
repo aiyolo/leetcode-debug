@@ -12,6 +12,9 @@ public:
         }
         return ans;
     }
+    void func(vector<int>&nums, int n){
+        cout << "func";
+    }
 };
 
 
@@ -22,5 +25,5 @@ int main(){
     // vector<int> a = {1,2};
     // tuple_type tp = make_tuple(a, 2);
     // cout << get<0>(tp);
-    cout << exc.init(&Solution::shuffle);
+    exc.init(&Solution::func);
 }

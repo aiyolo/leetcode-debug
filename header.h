@@ -38,7 +38,7 @@ template <typename Ret, typename... Args> struct function_traits<Ret(Args...)> {
   enum { arity = sizeof...(Args) };
   // typedef Ret function_type(Args...);
   using function_type = Ret(Args...);
-  typedef Ret return_type;
+  using return_type = Ret;
   using stl_function_type = std::function<function_type>;
   typedef Ret (*pointer)(Args...);
   using tuple_type = tuple<decay_t<Args>...>; // 需要移除掉输入参数的引用类型
@@ -590,20 +590,17 @@ double stringToDouble(string input) { return stod(input); }
 
 // enable_if 重载
 template <typename T>
-typename enable_if<is_same<T, string>::value, void>::type transform(string &s,
-                                                                    T &t) {
+typename enable_if<is_same<T, string>::value, void>::type transform(string &s,T &t) {
   t = stringToString(s);
 }
 
 template <typename T>
-typename enable_if<is_same<T, double>::value, void>::type transform(string &s,
-                                                                    T &t) {
+typename enable_if<is_same<T, double>::value, void>::type transform(string &s, T &t) {
   t = stringToString(s);
 }
 
 template <typename T>
-typename enable_if<is_same<T, int>::value, void>::type transform(string s,
-                                                                 T &t) {
+typename enable_if<is_same<T, int>::value, void>::type transform(string s, T &t) {
   t = stringToInteger(s);
 }
 
@@ -664,6 +661,7 @@ public:
       arr.push_back(s);
     }
     constexpr size_t I = function_traits<F>::arity;
+    using return_type = typename function_traits<F>::return_type;
     // using function_type = function_traits<F>::stl_function_type;
     // cout << I;
     using tuple_type = typename function_traits<F>::tuple_type;
@@ -674,22 +672,22 @@ public:
     cout << get<0>(tp);
     // return (*m_instance.*f)(a, 3);
     // return apply((*m_instance.*f), tp);
-    return call(f, make_index_sequence<I>{}, tp);
-    // return 1;
+    if constexpr (is_void_v<return_type>){
+      call(f, make_index_sequence<I>{}, tp);
+    }
+    else{
+      auto ans = call(f, make_index_sequence<I>{}, tp);
+      cout << ans;
+    }
   }
-  template <size_t I = 0, typename... Args, class Container>
-  typename enable_if<I == sizeof...(Args), void>::type
-  trans(Container &arr, 
-  tuple<Args...> &tp) {
-    return;
-  }
-  template <size_t I = 0, typename... Args, class Container>
-      typename enable_if < I<sizeof...(Args), void>::type
-                           trans(Container& arr, tuple<Args...> &tp) {
-    if constexpr (I == sizeof...(Args))
-      return;
-    transform(arr[I], get<I>(tp));
-    trans<I + 1>(arr, tp);
+  
+    template <size_t I = 0, typename Tuple, class Container>
+      void trans(Container& arr, Tuple &&tp) {
+    if constexpr (I == tuple_size<decay_t<Tuple>>::value) return;
+    else{ // 必须加else
+      transform(arr[I], get<I>(tp));
+      trans<I + 1>(arr, forward<Tuple>(tp));
+    }
   }
   template <typename F, class Tuple, size_t... I>
   constexpr decltype(auto) call(F &&f, index_sequence<I...>, Tuple &tp) {
