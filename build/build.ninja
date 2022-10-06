@@ -53,6 +53,38 @@ build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
 build edit_cache: phony CMakeFiles/edit_cache.util
 
 # =============================================================================
+# Object build statements for EXECUTABLE target multiplefunction
+
+
+#############################################
+# Order-only phony target for multiplefunction
+
+build cmake_object_order_depends_target_multiplefunction: phony || CMakeFiles/multiplefunction.dir
+
+build CMakeFiles/multiplefunction.dir/multiplefunction.cpp.o: CXX_COMPILER__multiplefunction ../multiplefunction.cpp || cmake_object_order_depends_target_multiplefunction
+  DEP_FILE = CMakeFiles/multiplefunction.dir/multiplefunction.cpp.o.d
+  FLAGS = -g   -std=gnu++17
+  OBJECT_DIR = CMakeFiles/multiplefunction.dir
+  OBJECT_FILE_DIR = CMakeFiles/multiplefunction.dir
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target multiplefunction
+
+
+#############################################
+# Link the executable multiplefunction
+
+build multiplefunction: CXX_EXECUTABLE_LINKER__multiplefunction CMakeFiles/multiplefunction.dir/multiplefunction.cpp.o
+  FLAGS = -g
+  LINK_FLAGS = -rdynamic
+  OBJECT_DIR = CMakeFiles/multiplefunction.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = multiplefunction
+  TARGET_PDB = multiplefunction.dbg
+
+# =============================================================================
 # Object build statements for EXECUTABLE target main
 
 
@@ -95,7 +127,7 @@ build main: CXX_EXECUTABLE_LINKER__main CMakeFiles/main.dir/main.cpp.o
 #############################################
 # Folder: /home/aiyolo/leetcode-debug/build
 
-build all: phony main
+build all: phony multiplefunction main
 
 # =============================================================================
 # Unknown Build Time Dependencies.

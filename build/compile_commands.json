@@ -1,6 +1,12 @@
 [
 {
   "directory": "/home/aiyolo/leetcode-debug/build",
+  "command": "/usr/bin/g++    -g   -std=gnu++17 -o CMakeFiles/multiplefunction.dir/multiplefunction.cpp.o -c /home/aiyolo/leetcode-debug/multiplefunction.cpp",
+  "file": "/home/aiyolo/leetcode-debug/multiplefunction.cpp"
+},
+
+{
+  "directory": "/home/aiyolo/leetcode-debug/build",
   "command": "/usr/bin/g++    -g   -std=gnu++17 -o CMakeFiles/main.dir/main.cpp.o -c /home/aiyolo/leetcode-debug/main.cpp",
   "file": "/home/aiyolo/leetcode-debug/main.cpp"
 }

@@ -5,19 +5,29 @@
 [项目路径](https://github.com/aiyolo/leetcode-debug)
 
 # 演示
-
-[link](https://p1.meituan.net/dpplatform/18253d49b9e0d1323868e34697f5f4248365722.gif)
-
-![](https://github.com/aiyolo/leetcode-debug/blob/main/demo.gif)
+简单三步
+![](demo.png)
 
 # 使用方法
 
 1. 复制 Solution 类到 main.cpp
 2. 复制测试用例数据到 testcase.txt
-3. 定义类成员参数，调用 parse(cin, …) 解析变量
-4. 默认使用 cmake 编译，c++ 标准要求 c++17 及以上
+3. 注册成员函数，后续会使用宏来简化注册过程
+4. 运行
+5. 默认使用 `cmake` 编译，c++ 标准要求 c++17 及以上
+
+# 注意事项
+
+1. 对于有多个成员函数需要运行的，请使用`multiplefunction.cpp`
+
+2. 所有成员函数最终的调用点在`MemberFunciton::exec`，请在此处自定义输出结果
 
 # 原理
+- 将类中所有成员函数名和成员函数地址对，注册到一个unordered_map，通过检索成员函数名即可找到成员函数地址
+- 为了存储不同的成员函数地址，需要将它们包装`MemberFunction`类，且所有的MemberFunction类都需要继承自同一个`MemberFunctionBase`基类
+- 结合元编程中`type_traits`的相关工具，将测试用例中的字符串解析成对应的函数的参数类型
+- 运行每一个测试用例中的函数
+
 
 大部分处理输入数据的函数来自 leetcode, 目前支持处理如下的数据类型，这些类型应对大部分测试用例都是可以的。
 
