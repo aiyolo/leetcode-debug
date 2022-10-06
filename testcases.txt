@@ -1,2 +1,2 @@
-["OrderedStream","insert","insert","insert","insert","insert"]
-[[5],[3,"ccccc"],[1,"aaaaa"],[2,"bbbbb"],[5,"eeeee"],[4,"ddddd"]]
+["MyCircularDeque","insertLast","insertLast","insertFront","insertFront","getRear","isFull","deleteLast","insertFront","getFront"]
+[[3],[1],[2],[3],[4],[],[],[],[4],[]]

@@ -60,10 +60,6 @@
 			{
 				"fragment" : "-rdynamic",
 				"role" : "flags"
-			},
-			{
-				"fragment" : "-lpthread",
-				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"

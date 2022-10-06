@@ -1,32 +1,27 @@
-#include <iostream>
-#include <string>
-#include <typeinfo>
-#include <memory>
-#include <cstdlib>
-#include <cxxabi.h>
-#include <boost/type_index.hpp>
 
-// template<typename T>
-// void Func(T&& obj)  // universal reference 必须是模板参数
-// {
-//     using boost::typeindex::type_id_with_cvr;
-//     std::cout << "obj = " << obj << '\n';
-//     std::cout << "T = " << type_id_with_cvr<T>().pretty_name() << '\n';
-// }
+#include "header.h"
 
-
-
-int main(void)
-{
-	// std::string str = "Test";
-	// Func(str);
-	// Func(std::move(str));
-
-	// system("pause");
-    {
-    char* name = abi::__cxa_demangle(typeid(std::string).name(), nullptr, nullptr, nullptr);
-    std::cout << name;
-    free(name);
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> umap;
+        for(int i=0; i<nums.size(); i++){
+            if(umap.count(target-nums[i])){
+                return {i, umap[target-nums[i]]};
+            }
+            else{
+                umap.insert({nums[i], i});
+            }
+        }
+        return {};
     }
-	return 0;
+};
+
+int main(){
+    Excecutor<Solution, true> exc;
+    exc.parsefromInputs();
+    exc.m_instance = exc.Instance<void>();
+    exc.registerMemberFunction("twoSum", &Solution::twoSum);
+    exc.run();
+
 }

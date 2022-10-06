@@ -704,17 +704,22 @@ public:
   vector<string> inputs;
   vector<string> functionNameArray;
   vector<string> functionArgArray;
-  
+  T* m_instance;
+
+public:
+  Excecutor(): m_instance(nullptr){};
+  ~Excecutor() = default;
+
   template <typename Args> 
-  T *Instance() {
-    if(simpleExcecutor){
-      m_instance = nullptr;
+  T* Instance() {
+    if constexpr(simpleExcecutor){
+      m_instance = new T();
     }
     else{
-      Args arg;
-      transform(functionArgArray[0], arg);
+      Args args;
+      transform(functionArgArray[0], args);
       if (m_instance == nullptr) {
-        m_instance = new T(arg);
+        m_instance = new T(args);
       }
     }
     return m_instance;
@@ -757,9 +762,14 @@ public:
     return output;
   }
   void run(){
-    for(int i=1; i<functionArgArray.size();i++){
-      vector<string> tmp = parseFromString(functionArgArray[i]);
-      (*funcMap[functionNameArray[i]])(m_instance, tmp);
+    if(simpleExcecutor){
+      (*(funcMap.begin()->second))(m_instance, functionArgArray);
+    }
+    else{
+        for(int i=1; i<functionArgArray.size();i++){
+        vector<string> tmp = parseFromString(functionArgArray[i]);
+        (*funcMap[functionNameArray[i]])(m_instance, tmp);
+      }
     }
   }
 
@@ -798,12 +808,8 @@ public:
   constexpr decltype(auto) call(F &&f, index_sequence<I...>, Tuple &tp) {
     return invoke(f, m_instance, get<I>(tp)...);
   }
-  // private:
-  Excecutor(): m_instance(nullptr){};
-  ~Excecutor() = default;
 
-public:
-  T *m_instance;
+
 };
 // // 定义静态成员变量
 // template <typename T> T *Excecutor<T>::m_instance = nullptr;

@@ -78,7 +78,6 @@ build CMakeFiles/main.dir/main.cpp.o: CXX_COMPILER__main ../main.cpp || cmake_ob
 build main: CXX_EXECUTABLE_LINKER__main CMakeFiles/main.dir/main.cpp.o
   FLAGS = -g
   LINK_FLAGS = -rdynamic
-  LINK_LIBRARIES = -lpthread
   OBJECT_DIR = CMakeFiles/main.dir
   POST_BUILD = :
   PRE_LINK = :
