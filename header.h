@@ -279,19 +279,40 @@ inline string stringToString(string input) {
   return result;
 }
 
+// inline vector<string> stringToStringVector(string input) {
+//   vector<string> output;
+//   trimLeftTrailingSpaces(input);
+//   trimRightTrailingSpaces(input);
+//   input = input.substr(1, input.length() - 2);
+//   stringstream ss;
+//   ss.str(input);
+//   string item;
+//   char delim = ',';
+//   while (getline(ss, item, delim)) {
+//     trimLeftTrailingSpaces(item);
+//     trimRightTrailingSpaces(item);
+//     output.push_back(stringToString(item));
+//   }
+//   return output;
+// }
+
 inline vector<string> stringToStringVector(string input) {
   vector<string> output;
   trimLeftTrailingSpaces(input);
   trimRightTrailingSpaces(input);
   input = input.substr(1, input.length() - 2);
-  stringstream ss;
-  ss.str(input);
-  string item;
-  char delim = ',';
-  while (getline(ss, item, delim)) {
-    trimLeftTrailingSpaces(item);
-    trimRightTrailingSpaces(item);
-    output.push_back(stringToString(item));
+  int cnt = 0; int i=0, j=0;
+  while(i<input.size()){
+    while(j<input.size() && input[j]!=','){
+      if(input[j]=='[') cnt++;
+      if(input[j]==']') cnt--;
+      j++;
+    }
+    if(cnt==0){
+      output.push_back(stringToString(input.substr(i, j-i)));
+      i=j+1;
+    }
+    j++;
   }
   return output;
 }
@@ -636,9 +657,18 @@ transform(string s, T &t) {
   t = stringToTreeNode(s);
 }
 
+   template <size_t I = 0, typename Tuple, class Container>
+    void trans(Container& arr, Tuple &&tp) {
+    if constexpr (I == tuple_size<decay_t<Tuple>>::value) return;
+    else{ // 必须加else
+      transform(arr[I], get<I>(tp));
+      trans<I + 1>(arr, forward<Tuple>(tp));
+    }
+  }
+
 template <typename T>
 struct MemFunctionBase{
-  virtual void operator()(T *obj, void* m_arguments) {} // 需要虚函数调用子类函数
+  virtual void operator()(T *obj, vector<string>& strArg) {} // 需要虚函数调用子类函数
 };
 
 template <typename T, typename F>
@@ -646,68 +676,99 @@ struct MemFunction:public MemFunctionBase<T>{
   using tuple_type = typename function_traits<F>::tuple_type;
   using return_type = typename function_traits<F>::return_type;
   static constexpr size_t I = function_traits<F>::arity;
-
-  // tuple_type m_arguments;
   F m_func;
 
   MemFunction(F func):m_func(func){}
 
   // 输出位置
   template<size_t...Is>
-  void exec(T* obj, void* m_arguments, index_sequence<Is...>){
+  void exec(T* obj, vector<string>& strArg, index_sequence<Is...>){
+    tuple_type tpArg;
+    trans(strArg, tpArg);
     if constexpr (is_void_v<return_type>){
-      (*obj.*m_func)(get<Is>(*(tuple_type*)(m_arguments))...);
+      (*obj.*m_func)(get<Is>(tpArg)...);
     }
     else{
-      cout << (*obj.*m_func)(get<Is>(*(tuple_type*)(m_arguments))...);
+      cout << (*obj.*m_func)(get<Is>(tpArg)...);
     }
   }
-  void operator()(T* obj, void* m_arguments){
-    exec(obj, m_arguments, make_index_sequence<I>());
+  void operator()(T* obj, vector<string>& strArg){
+    exec(obj, strArg, make_index_sequence<I>());
   }
 } ;
 
 
-template <typename T> class Excecutor {
+template <typename T, bool simpleExcecutor = true> class Excecutor {
 public:
   unordered_map<string, MemFunctionBase<T>*> funcMap;
-  vector<string> m_arguments;
-  template <typename... Args> static T *Instance(Args &&...args) {
-    if (m_instance == nullptr) {
-      m_instance = new T(forward<T>(args)...);
+  vector<string> inputs;
+  vector<string> functionNameArray;
+  vector<string> functionArgArray;
+  
+  template <typename Args> 
+  T *Instance() {
+    if(simpleExcecutor){
+      m_instance = nullptr;
+    }
+    else{
+      Args arg;
+      transform(functionArgArray[0], arg);
+      if (m_instance == nullptr) {
+        m_instance = new T(arg);
+      }
     }
     return m_instance;
   }
 
-  void parse(){
+  void parsefromInputs(){
     ifstream cin("../testcases.txt");
     string str;
     while (getline(cin, str)) {
-      m_arguments.push_back(str);
+      inputs.push_back(str);
+    }
+    if(!simpleExcecutor){
+      functionNameArray = stringToStringVector(inputs[0]);
+      functionArgArray = stringToStringVector(inputs[1]);
+    }
+    else{
+      functionArgArray = inputs;
+    }
+  }
+  vector<string> parseFromString(string str){
+    vector<string> output;
+    int i=0, j=0;int cnt=0;
+    while(i<str.size()){
+      while(j<str.size() && str[j]!=','){
+        if(str[j]=='[') cnt++;
+        if(str[j]==']') cnt--;
+        j++;
+      }
+      if(cnt == 0) {
+        if(str[0]=='\"'){
+          output.push_back(stringToString(str.substr(i, j-i)));
+        }
+        else{
+          output.push_back(str.substr(i, j-i));
+        }
+        i=j +1;
+      }
+      j++;
+    }
+    return output;
+  }
+  void run(){
+    for(int i=1; i<functionArgArray.size();i++){
+      vector<string> tmp = parseFromString(functionArgArray[i]);
+      (*funcMap[functionNameArray[i]])(m_instance, tmp);
     }
   }
 
-  void run(){
-    vector<string> cmd;
-    vector<string> args;
-    cmd = stringToStringVector(m_arguments[0]);
-    cout << cmd;
-    args = stringToStringVector(m_arguments[1]);
-    cout << args;
-    // for(int i=0; i<m_arguments.size(); i++){
-
-    // }
-  }
-
   template<typename F>
-  void callMemFunc(string s, F&& func){
-    using tuple_type = typename function_traits<F>::tuple_type;
-    tuple_type tp;
-    trans(m_arguments, tp);
+  void registerMemberFunction(string s, F&& func){
     MemFunctionBase<T>* pFuncBase = static_cast<MemFunctionBase<T>*>(new MemFunction<T, F>(func)); 
     funcMap.emplace(s, pFuncBase);
-    (*funcMap["shuffle"])(m_instance, (void*)(&tp));
   }
+
 
 
   template <typename F>
@@ -732,28 +793,17 @@ public:
     }
   }
   
-    template <size_t I = 0, typename Tuple, class Container>
-      void trans(Container& arr, Tuple &&tp) {
-    if constexpr (I == tuple_size<decay_t<Tuple>>::value) return;
-    else{ // 必须加else
-      transform(arr[I], get<I>(tp));
-      trans<I + 1>(arr, forward<Tuple>(tp));
-    }
-  }
+ 
   template <typename F, class Tuple, size_t... I>
   constexpr decltype(auto) call(F &&f, index_sequence<I...>, Tuple &tp) {
     return invoke(f, m_instance, get<I>(tp)...);
   }
   // private:
-  Excecutor() = default;
+  Excecutor(): m_instance(nullptr){};
   ~Excecutor() = default;
 
 public:
-  int m_args;
-
-private:
-  static T *m_instance;
-  // tuple<any> tp;
+  T *m_instance;
 };
-// 定义静态成员变量
-template <typename T> T *Excecutor<T>::m_instance = nullptr;
+// // 定义静态成员变量
+// template <typename T> T *Excecutor<T>::m_instance = nullptr;
