@@ -16,6 +16,7 @@
 #include <memory>
 #include <mutex>
 #include <numeric>
+#include <ostream>
 #include <queue>
 #include <random>
 #include <set>
@@ -606,6 +607,16 @@ inline TreeNode *stringToTreeNode(std::string input) {
     }
   }
   return root;
+}
+
+inline std::ostream& operator<<(std::ostream &os, ListNode* head){
+  prettyPrintLinkedList(head);
+  return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, TreeNode* root){
+  prettyPrintTree(root);
+  return os;
 }
 
 inline bool stringToBool(std::string input) {
