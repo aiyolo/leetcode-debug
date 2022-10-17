@@ -206,39 +206,6 @@ inline void trimRightTrailingSpaces(std::string &input) {
       input.end());
 }
 
-inline std::vector<int> stringToIntegerVector(std::string input) {
-  std::vector<int> output;
-  trimLeftTrailingSpaces(input);
-  trimRightTrailingSpaces(input);
-  input = input.substr(1, input.length() - 2);
-  std::stringstream ss;
-  ss.str(input);
-  std::string item;
-  char delim = ',';
-  while (getline(ss, item, delim)) {
-    output.push_back(stoi(item));
-  }
-  return output;
-}
-
-inline std::vector<std::vector<int>>
-stringTo2dIntegerVector(std::string input) {
-  std::vector<std::vector<int>> output;
-  trimLeftTrailingSpaces(input);
-  trimRightTrailingSpaces(input);
-  input = input.substr(0, input.length() - 2);
-  std::stringstream ss;
-  ss.str(input);
-  std::string item;
-  char delim = ']';
-  while (getline(ss, item, delim)) {
-    item += ']';
-    item = item.substr(1);
-    output.emplace_back(stringToIntegerVector(item));
-  }
-  return output;
-}
-
 inline std::string stringToString(std::string input) {
   assert(input.length() >= 2);
   std::string result;
@@ -280,6 +247,73 @@ inline std::string stringToString(std::string input) {
     }
   }
   return result;
+}
+
+
+inline std::vector<int> stringToIntegerVector(std::string input) {
+  std::vector<int> output;
+  trimLeftTrailingSpaces(input);
+  trimRightTrailingSpaces(input);
+  input = input.substr(1, input.length() - 2);
+  std::stringstream ss;
+  ss.str(input);
+  std::string item;
+  char delim = ',';
+  while (getline(ss, item, delim)) {
+    output.push_back(stoi(item));
+  }
+  return output;
+}
+
+inline std::vector<char> stringToCharVector(std::string input) {
+  std::vector<char> output;
+  trimLeftTrailingSpaces(input);
+  trimRightTrailingSpaces(input);
+  input = input.substr(1, input.length() - 2);
+  std::stringstream ss;
+  ss.str(input);
+  std::string item;
+  char delim = ',';
+  while (getline(ss, item, delim)) {
+    output.push_back(stringToString(item)[0]);
+  }
+  return output;
+}
+
+inline std::vector<std::vector<int>>
+stringTo2dIntegerVector(std::string input) {
+  std::vector<std::vector<int>> output;
+  trimLeftTrailingSpaces(input);
+  trimRightTrailingSpaces(input);
+  input = input.substr(0, input.length() - 2);
+  std::stringstream ss;
+  ss.str(input);
+  std::string item;
+  char delim = ']';
+  while (getline(ss, item, delim)) {
+    item += ']';
+    item = item.substr(1);
+    output.emplace_back(stringToIntegerVector(item));
+  }
+  return output;
+}
+
+inline std::vector<std::vector<char>>
+stringTo2dCharVector(std::string input) {
+  std::vector<std::vector<char>> output;
+  trimLeftTrailingSpaces(input);
+  trimRightTrailingSpaces(input);
+  input = input.substr(0, input.length() - 2);
+  std::stringstream ss;
+  ss.str(input);
+  std::string item;
+  char delim = ']';
+  while (getline(ss, item, delim)) {
+    item += ']';
+    item = item.substr(1);
+    output.emplace_back(stringToCharVector(item));
+  }
+  return output;
 }
 
 // inline vector<string> stringToStringVector(string input) {
@@ -654,10 +688,23 @@ stringToTarget(std::string s, T &t) {
 }
 
 template <typename T>
+typename std::enable_if<std::is_same<T, std::vector<char>>::value, void>::type
+stringToTarget(std::string s, T &t) {
+  t = stringToCharVector(s);
+}
+
+template <typename T>
 typename std::enable_if<std::is_same<T, std::vector<std::vector<int>>>::value,
                         void>::type
 stringToTarget(std::string s, T &t) {
   t = stringTo2dIntegerVector(s);
+}
+
+template <typename T>
+typename std::enable_if<std::is_same<T, std::vector<std::vector<char>>>::value,
+                        void>::type
+stringToTarget(std::string s, T &t) {
+  t = stringTo2dCharVector(s);
 }
 
 template <typename T>
