@@ -1,26 +1,38 @@
 
 #include "header.h"
+#include <functional>
 
 using namespace std;
 
 class Solution {
 public:
-    bool isValidSudoku(vector<vector<char>>& board) {
-        int row[9][10] = {0};
-        int col[9][10] = {0};
-        int box[9][10] = {0};
-        for(int i=0; i<9; i++){
-            for(int j=0; j<9; j++){
-                if(board[i][j]=='.') continue;
-                if(row[i][board[i][j]-'0']==1) return false;
-                if(col[j][board[i][j]-'0']==1) return false;
-                if(box[3*(i/3)+j/3][board[i][j]-'0']==1) return false;
-                row[i][board[i][j]-'0'] = 1;
-                col[j][board[i][j]-'0'] =1;
-                box[3*(i/3)+j/3][board[i][j]-'0'] =1;
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n= matrix[0].size();
+        int left=0,right=n-1;
+        int up=0, down=m-1;
+        int r=0, c=0;
+        vector<int> ans;
+        while(left<=right && up<=down){
+            for(int i=left,j=up ; j<=right; j++){
+                ans.push_back(matrix[i][j]);
             }
+            for(int i=up+1, j=right; i<=down; i++){
+                ans.push_back(matrix[i][j]);
+            }
+            if(left<right && up<down){
+                for(int i=down, j=right-1; j>=left; j--){
+                ans.push_back(matrix[i][j]);
+                }
+                for(int i=down-1, j=left; i>=up+1; i--){
+                    ans.push_back(matrix[i][j]);
+                }
+            }
+            left++;
+            right--;
+            up++;
+            down--;
         }
-        return true;
+        return ans;
     }
 };
 
@@ -29,6 +41,6 @@ public:
 int main() {
   Excecutor<Solution, true> exc("../testcases.txt");
   exc.instance = exc.createInstance<void>();
-  REGISTER(isValidSudoku)
+  REGISTER(spiralOrder)
   exc.run();
 }

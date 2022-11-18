@@ -530,6 +530,19 @@ std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
+template <typename T, typename U>
+std::ostream &operator<<(std::ostream &os,
+                         const std::vector<std::pair<T, U>> &arr) {
+  os << "[";
+  for (int i = 0; i < arr.size(); i++) {
+    os << "[" << arr[i].first << ", " << arr[i].second << "]";
+    if (i != arr.size() - 1)
+      os << std::endl;
+  }
+  os << "]";
+  return os;
+}
+
 // TreeNode* null = nullptr;
 
 // TreeNode* createTree(vector<any> &arr){
@@ -672,7 +685,7 @@ stringToTarget(std::string &s, T &t) {
 template <typename T>
 typename std::enable_if<std::is_same<T, double>::value, void>::type
 stringToTarget(std::string &s, T &t) {
-  t = stringToString(s);
+  t = stringToDouble(s);
 }
 
 template <typename T>
