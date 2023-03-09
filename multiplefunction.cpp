@@ -3,92 +3,54 @@
 #include <algorithm>
 using namespace std;
 
-class MyCircularDeque {
+class MinStack {
 public:
-    vector<int> arr;
-    int front;
-    int size;
-    int capacity;
-    MyCircularDeque(int k) {
-        capacity = k;
-        arr.resize(k);
-        front = 0;
-        size = 0;
+    /** initialize your data structure here. */
+    stack<pair<int,int>> stk;
+    stack<pair<int,int>> minStk;
+    int id;
+    MinStack() {
+        id = 0;
     }
     
-    bool insertFront(int value) {
-        if(isFull()){
-            return false;
+    void push(int x) {
+        stk.push({id, x});
+        if(minStk.empty() || x<=minStk.top().second){
+            minStk.push({id, x});
         }
-        front = (front-1+capacity)%capacity;
-        arr[front] = value;
-        size++;
-        return true;
+        id++;
     }
     
-    bool insertLast(int value) {
-        if(isFull()){
-            return false;
+    void pop() {
+        auto [tid, tx] = stk.top();
+        stk.pop();
+        if(!minStk.empty() && tid==minStk.top().first){
+            minStk.pop();
         }
-        int back = (front+size)%capacity;
-        arr[back] =value;
-        size++;
-        return true;
     }
     
-    bool deleteFront() {
-        if(isEmpty()){
-            return false;
-        }
-        front = (front+1)%capacity;
-        size--;
-        return true;
+    int top() {
+        return stk.top().second;
     }
     
-    bool deleteLast() {
-        if(isEmpty()){
-            return false;
-        }
-        size--;
-        return true;
-    }
-    
-    int getFront() {
-        if(isEmpty()){
-            return -1;
-        }
-        return arr[front];
-    }
-    
-    int getRear() {
-        if(isEmpty()){
-            return -1;
-        }
-        int back = (front+size-1)%capacity;
-        return arr[back];
-    }
-    
-    bool isEmpty() {
-        return size==0;
-    }
-    
-    bool isFull() {
-        return size==capacity;
+    int min() {
+        return minStk.top().second;
     }
 };
-#define REGISTER(func) exc.registerMemberFunction(#func, &MyCircularDeque::func);
+
+#define REGISTER(func) exc.registerMemberFunction(#func, &MinStack::func);
 
 int main() {
-  Excecutor<MyCircularDeque, false> exc("../multiplefunction.txt");
-  exc.instance = exc.createInstance<int>();
-  REGISTER(insertFront)
-  REGISTER(insertLast)
-  REGISTER(deleteFront)
-  REGISTER(deleteLast)
-  REGISTER(getFront)
-  REGISTER(getRear)
-  REGISTER(isEmpty)
-  REGISTER(isFull)
+  Excecutor<MinStack, false> exc("../multiplefunction.txt");
+  exc.instance = exc.createInstance<void>();
+  REGISTER(push)
+  REGISTER(pop)
+  REGISTER(top)
+  REGISTER(min)
+  // REGISTER(getFront)
+  // REGISTER(getRear)
+  // REGISTER(isEmpty)
+  // REGISTER(isFull)
   exc.run();
 
   // inputs

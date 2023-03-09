@@ -1,2 +1,2 @@
-["MyCircularDeque","insertLast","insertLast","insertFront","insertFront","getRear","isFull","deleteLast","insertFront","getFront"]
-[[3],[1],[2],[3],[4],[],[],[],[4],[]]
+["MinStack","push","push","push","min","pop","top","min"]
+[[],[-2],[0],[-3],[],[],[],[]]

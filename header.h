@@ -749,40 +749,45 @@ void ArrayToTuple(Array &arr, Tuple &&tp) {
   }
 }
 
-template <typename T> struct MemberFuntionBase {
+template <typename T> struct MemberFunctionBase {
   virtual void operator()(T *obj, std::vector<std::string> &strArg) {
   } // 需要虚函数调用子类函数
+  virtual ~MemberFunctionBase(){};
 };
 
 template <typename T, typename F>
-struct MemberFuntion : public MemberFuntionBase<T> {
+struct MemberFunction : public MemberFunctionBase<T> {
   using tuple_type = typename function_traits<F>::tuple_type;
   using return_type = typename function_traits<F>::return_type;
   static constexpr size_t I = function_traits<F>::arity;
   F m_func;
 
-  MemberFuntion(F func) : m_func(func) {}
+  MemberFunction(F func) : m_func(func) {}
+  ~MemberFunction() override{}
 
   // 输出位置
   template <size_t... Is>
   void exec(T *obj, std::vector<std::string> &strArg,
             std::index_sequence<Is...>) {
+    // 将传入的string参数，转化为函数实际参数类型，存在tuple里
     tuple_type tpArg;
     ArrayToTuple(strArg, tpArg);
+    // 如果成员函数返回值为void，那么直接执行函数
     if constexpr (std::is_void_v<return_type>) {
       (*obj.*m_func)(std::get<Is>(tpArg)...);
-    } else {
+    } else { // 如果具有非空返回值，那么打印出来，前面已经对cout实现了重载
       std::cout << (*obj.*m_func)(std::get<Is>(tpArg)...);
     }
   }
   void operator()(T *obj, std::vector<std::string> &strArg) {
+    // 为了展开参数，使用了index_sequence
     exec(obj, strArg, std::make_index_sequence<I>());
   }
 };
 
 template <typename T, bool simpleExcecutor = true> class Excecutor {
 public:
-  std::unordered_map<std::string, MemberFuntionBase<T> *> funcMap;
+  std::unordered_map<std::string, std::unique_ptr<MemberFunctionBase<T>>> funcMap;
   std::vector<std::string> inputs;
   std::vector<std::string> functionNameArray;
   std::vector<std::string> functionArgArray;
@@ -801,11 +806,17 @@ public:
     if constexpr (simpleExcecutor) {
       instance = new T();
     } else {
-      Args args;
-      stringToTarget(functionArgArray[0], args);
-      if (instance == nullptr) {
-        instance = new T(args);
-      }
+        // 如果构造函数是无参的
+        if constexpr (std::is_void_v<Args>){
+          instance = new T();
+        }
+        else{
+          Args args;
+          stringToTarget(functionArgArray[0], args);
+          if (instance == nullptr) {
+            instance = new T(args);
+          }
+        }
     }
     return instance;
   }
@@ -816,10 +827,11 @@ public:
     while (getline(cin, str)) {
       inputs.push_back(str);
     }
+    // 如果设计类leetcode题，那么第一行为函数名，第二行为函数参数
     if (!simpleExcecutor) {
       functionNameArray = stringToStringVector(inputs[0]);
       functionArgArray = stringToStringVector(inputs[1]);
-    } else {
+    } else { // 如果是Solution类的题目，那么输入就是参数
       functionArgArray = inputs;
     }
   }
@@ -836,8 +848,9 @@ public:
   }
 
   template <typename F> void registerMemberFunction(std::string s, F &&func) {
-    MemberFuntionBase<T> *pFuncBase =
-        static_cast<MemberFuntionBase<T> *>(new MemberFuntion<T, F>(func));
+    // 把它们先上行转化，存入到funcmap里
+    // 在调用的时候，通过调用父类的虚函数operator()()方法，来调用到子类的成员函数
+    auto pFuncBase = static_cast<MemberFunctionBase<T> *>(new MemberFunction<T, F>(std::forward<F>(func)));
     funcMap.emplace(s, pFuncBase);
   }
 };
