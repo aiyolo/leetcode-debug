@@ -1,6 +1,6 @@
 
 #include "header.h"
-#include <algorithm>
+
 using namespace std;
 
 class MinStack {
@@ -41,19 +41,12 @@ public:
 #define REGISTER(func) exc.registerMemberFunction(#func, &MinStack::func);
 
 int main() {
+// Excecutor的第一个模板参数为类名，第二个模板参数为false；
   Excecutor<MinStack, false> exc("../multiplefunction.txt");
   exc.instance = exc.createInstance<void>();
   REGISTER(push)
   REGISTER(pop)
   REGISTER(top)
   REGISTER(min)
-  // REGISTER(getFront)
-  // REGISTER(getRear)
-  // REGISTER(isEmpty)
-  // REGISTER(isFull)
   exc.run();
-
-  // inputs
-  // ["MyCircularDeque","insertLast","insertLast","insertFront","insertFront","getRear","isFull","deleteLast","insertFront","getFront"]
-  // [[3],[1],[2],[3],[4],[],[],[],[4],[]]
 }

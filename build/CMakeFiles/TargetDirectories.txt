@@ -1,4 +1,0 @@
-/home/aiyolo/leetcode-debug/build/CMakeFiles/rebuild_cache.dir
-/home/aiyolo/leetcode-debug/build/CMakeFiles/edit_cache.dir
-/home/aiyolo/leetcode-debug/build/CMakeFiles/multiplefunction.dir
-/home/aiyolo/leetcode-debug/build/CMakeFiles/main.dir
