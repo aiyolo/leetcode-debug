@@ -776,7 +776,7 @@ struct MemberFunction : public MemberFunctionBase<T> {
     if constexpr (std::is_void_v<return_type>) {
       (*obj.*m_func)(std::get<Is>(tpArg)...);
     } else { // 如果具有非空返回值，那么打印出来，前面已经对cout实现了重载
-      std::cout << (*obj.*m_func)(std::get<Is>(tpArg)...);
+      std::cout << (*obj.*m_func)(std::get<Is>(tpArg)...)<<std::endl;
     }
   }
   void operator()(T *obj, std::vector<std::string> &strArg) {
